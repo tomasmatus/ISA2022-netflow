@@ -36,6 +36,9 @@ class Netflowv5 {
 
     Netflowv5(const struct pcap_pkthdr *pcap_hdr, const u_char *packet);
 
+    private:
+        // last recieved packet timestamp
+
 };
 
 #endif // netflowv5

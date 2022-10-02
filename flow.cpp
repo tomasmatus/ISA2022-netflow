@@ -99,6 +99,7 @@ int main(int argc, char **argv)
         std::cerr << "Error when opening pcap file: " << errbuf << "\n";
         return 1;
     }
+    // TODO add filter
 
     if (pcap_loop(fd, -1, read_packet, nullptr) == PCAP_ERROR) {
         std::cerr << "pcap_loop fail: " << errbuf << std::endl;

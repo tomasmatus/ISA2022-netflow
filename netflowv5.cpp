@@ -11,7 +11,7 @@ Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet)
     srcaddr = ntohl(ip->ip_src.s_addr);
     dstaddr = ntohl(ip->ip_dst.s_addr);
 
-    uint8_t protocol = (ip->ip_p);
+    uint8_t protocol = ip->ip_p;
     switch (protocol)
     {
         case PROTOCOL_TCP:
@@ -20,7 +20,7 @@ Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet)
             const struct tcphdr *tcp = (struct tcphdr*)(packet + sizeof(struct ether_header) + ip->ip_hl * 4);
             srcport = ntohs(tcp->th_sport);
             dstport = ntohs(tcp->th_dport);
-            // TODO TCP flags
+            tcp_flags = tcp->th_dport;
             break;
         }
 
@@ -30,6 +30,7 @@ Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet)
             const struct udphdr *udp = (struct udphdr*)(packet + sizeof(struct ether_header) + ip->ip_hl * 4);
             srcport = ntohs(udp->uh_sport);
             dstport = ntohs(udp->uh_dport);
+            tcp_flags = 0;
             break;
         }
 
@@ -37,13 +38,14 @@ Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet)
         {
             srcport = 0;
             dstport = 0;
+            tcp_flags = 0;
         }
 
         default:
             break;
     }
 
-    nexthop = 0;
+    nexthop = 0; // always
     input = 0;
     output = 0;
     d_pkts = 1;
@@ -51,8 +53,8 @@ Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet)
     first = 0;
     last = 0;
     tos = ip->ip_tos;
-    src_as = 0;
-    dst_as = 0;
+    src_as = 0; // always
+    dst_as = 0; // always
     src_mask = 0;
     dst_mask = 0;
 }
