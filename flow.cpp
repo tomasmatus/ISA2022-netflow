@@ -10,9 +10,32 @@
 #include <getopt.h>
 
 #include <pcap/pcap.h>
+#include <net/ethernet.h>       // struct ethernet
+#include <netinet/ether.h>      // ether_ntoa
+#include <netinet/ip.h>         // struct ip
+#include <netinet/ip6.h>        // struct ip6_hdr
+#include <netinet/in.h>         // inet_ntoa
+#include <netinet/tcp.h>
+#include <netinet/udp.h>
 
-int main(int argc,
-         char **argv)
+#include "netflowv5.hpp"
+
+#define BUFFLEN 64
+
+void read_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
+{
+    const struct ether_header *eth = (struct ether_header*)(packet);
+    auto type = ntohs(eth->ether_type);
+    // TODO get time
+    char time[BUFFLEN];
+
+    if (type == ETHERTYPE_IP)
+    {
+        Netflowv5 *flow = new Netflowv5(header, packet);
+    }
+}
+
+int main(int argc, char **argv)
 {
     const char *shortopts = "f:c:a:i:m:";
     int opt = 0;
@@ -69,5 +92,19 @@ int main(int argc,
         }
     }
 
+    char errbuf[PCAP_ERRBUF_SIZE];
+    pcap_t *fd = pcap_open_offline (filename.c_str(), errbuf);
+    if (fd == NULL)
+    {
+        std::cerr << "Error when opening pcap file: " << errbuf << "\n";
+        return 1;
+    }
+
+    if (pcap_loop(fd, -1, read_packet, nullptr) == PCAP_ERROR) {
+        std::cerr << "pcap_loop fail: " << errbuf << std::endl;
+        return 1;
+    }
+
+    pcap_close(fd);
     return 0;
 }
