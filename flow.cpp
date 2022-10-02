@@ -26,8 +26,6 @@ void read_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *p
 {
     const struct ether_header *eth = (struct ether_header*)(packet);
     auto type = ntohs(eth->ether_type);
-    // TODO get time
-    char time[BUFFLEN];
 
     if (type == ETHERTYPE_IP)
     {

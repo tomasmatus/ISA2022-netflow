@@ -45,16 +45,12 @@ Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet)
             break;
     }
 
-    nexthop = 0; // always
-    input = 0;
-    output = 0;
+    struct sysinfo info;
+    sysinfo(&info);
+
     d_pkts = 1;
     d_octets = 0; // ??? TODO
-    first = 0;
-    last = 0;
+    first = info.uptime;
+    last = info.uptime;
     tos = ip->ip_tos;
-    src_as = 0; // always
-    dst_as = 0; // always
-    src_mask = 0;
-    dst_mask = 0;
 }
