@@ -19,7 +19,7 @@ pdf:
 	pdflatex $(NAME)
 
 #### flow
-$(exec): flow.o netflowv5.o
+$(exec): flow.o netflowv5.o flow_cache.o
 	$(CXX) $(CXXFLAGS) $^ -o $@ $(LDLIBS)
 
 #### Object files

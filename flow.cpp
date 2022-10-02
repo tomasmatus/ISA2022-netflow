@@ -19,8 +19,11 @@
 #include <netinet/udp.h>
 
 #include "netflowv5.hpp"
+#include "flow_cache.hpp"
 
 #define BUFFLEN 64
+
+FlowCache flow_cache;
 
 void read_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
 {
@@ -30,6 +33,7 @@ void read_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *p
     if (type == ETHERTYPE_IP)
     {
         Netflowv5 *flow = new Netflowv5(header, packet);
+        flow_cache.insert_update_flow(flow);
     }
 }
 
@@ -37,7 +41,7 @@ int main(int argc, char **argv)
 {
     const char *shortopts = "f:c:a:i:m:";
     int opt = 0;
-    std::string filename = "";
+    std::string filename = "-"; // "-" is a synonym for stdin
     std::string collector = "127.0.0.1:2055";
     int active_timer = 60;
     int inactive_timer = 10;
