@@ -32,7 +32,7 @@ void read_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *p
 
     if (type == ETHERTYPE_IP)
     {
-        Netflowv5 *flow = new Netflowv5(header, packet);
+        Netflowv5 *flow = new Netflowv5(header, packet, flow_cache.get_miliseconds(header->ts.tv_sec, header->ts.tv_usec));
         flow_cache.insert_update_flow(flow);
     }
 }

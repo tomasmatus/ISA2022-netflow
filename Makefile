@@ -5,7 +5,7 @@
 ###############################
 
 CXX=g++
-CXXFLAGS=--std=c++17 -g -Wall -Wextra
+CXXFLAGS=--std=c++11 -g -Wall -Wextra
 LDLIBS=-lpcap
 exec=flow
 login=xmatus37

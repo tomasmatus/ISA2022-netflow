@@ -5,7 +5,7 @@
 #define PROTOCOL_ICMP 8
 #define PROTOCOL_UDP 17
 
-Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet)
+Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet, uint32_t time_ms)
 {
     const struct ip *ip = (struct ip*)(packet + sizeof(struct ether_header));
     srcaddr = ntohl(ip->ip_src.s_addr);
@@ -45,12 +45,9 @@ Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet)
             break;
     }
 
-    struct sysinfo info;
-    sysinfo(&info);
-
     d_pkts = 1;
     d_octets = 0; // ??? TODO
-    first = info.uptime;
-    last = info.uptime;
+    first = time_ms;
+    last = time_ms;
     tos = ip->ip_tos;
 }

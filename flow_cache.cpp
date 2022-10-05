@@ -9,9 +9,11 @@ void FlowCache::insert_update_flow(Netflowv5 *flow)
     {
         // update existing flow
         search->second->d_pkts++;
-        search->second->d_octets;
+        search->second->d_octets; // TODO
         search->second->last = flow->last;
         search->second->tcp_flags |= flow->tcp_flags;
+
+        delete flow;
     }
     else
     {
@@ -23,4 +25,15 @@ void FlowCache::insert_update_flow(Netflowv5 *flow)
 std::size_t FlowCache::get_cache_size()
 {
     return cache.size();
+}
+
+uint32_t FlowCache::get_miliseconds(uint32_t s, uint32_t us)
+{
+    if (!sys_uptime_ms)
+    {
+        sys_uptime_ms = s * 1000 + us / 1000;
+        return 0;
+    }
+
+    return (s * 1000 + us / 1000) - sys_uptime_ms;
 }

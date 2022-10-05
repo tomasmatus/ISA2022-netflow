@@ -2,7 +2,9 @@
 #define netflowv5_hpp
 
 #include <cstdint>
+#include <iostream>
 
+#include <pcap/pcap.h>
 #include <net/ethernet.h>       // struct ethernet
 #include <netinet/ether.h>      // ether_ntoa
 #include <netinet/in.h>         // inet_ntoa
@@ -35,11 +37,7 @@ class Netflowv5 {
         uint8_t dst_mask = 0;
         uint16_t pad1 = 0;
 
-    Netflowv5(const struct pcap_pkthdr *pcap_hdr, const u_char *packet);
-
-    private:
-        // last recieved packet timestamp
-        uint32_t last_recorded_time;
+    Netflowv5(const struct pcap_pkthdr *pcap_hdr, const u_char *packet, u_int32_t time_ms);
 
 };
 
