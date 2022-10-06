@@ -1,6 +1,6 @@
 /*
  * ISA project
- * Autor: Tomáš Matuš
+ * Author: Tomáš Matuš
  * Login: xmatus37
  * Date: 29.09.2022
  */
@@ -62,7 +62,7 @@ int main(int argc, char **argv)
             
             // active timer timeout
             case 'a':
-                active_timer = std::stoi(optarg);
+                active_timer = std::stoi(optarg) * 1000;
                 if (active_timer <= 0)
                 {
                     std::cerr << "Active timer value must be above 0. Specified value: " << active_timer << "\n";
@@ -71,7 +71,7 @@ int main(int argc, char **argv)
                 break;
             // inactive timer timeout
             case 'i':
-                inactive_timer = std::stoi(optarg);
+                inactive_timer = std::stoi(optarg) * 1000;
                 if (inactive_timer <= 0)
                 {
                     std::cerr << "Inactive timer value must be above 0. Specified value: " << inactive_timer << "\n";
@@ -93,6 +93,8 @@ int main(int argc, char **argv)
                 exit(1);
         }
     }
+
+    flow_cache.set_flowcache(active_timer, inactive_timer, cache_size, collector);
 
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t *fd = pcap_open_offline (filename.c_str(), errbuf);

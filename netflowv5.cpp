@@ -46,7 +46,7 @@ Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet, uin
     }
 
     d_pkts = 1;
-    d_octets = 0; // ??? TODO
+    d_octets = header->caplen - sizeof(struct ether_header);
     first = time_ms;
     last = time_ms;
     tos = ip->ip_tos;
