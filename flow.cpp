@@ -43,8 +43,8 @@ int main(int argc, char **argv)
     int opt = 0;
     std::string filename = "-"; // "-" is a synonym for stdin
     std::string collector = "127.0.0.1:2055";
-    int active_timer = 60;
-    int inactive_timer = 10;
+    int active_timer = 60 * 1000;
+    int inactive_timer = 10 * 1000;
     int cache_size = 1024;
 
     while ((opt = getopt (argc, argv, shortopts)) != -1)
@@ -109,7 +109,10 @@ int main(int argc, char **argv)
         std::cerr << "pcap_loop fail: " << errbuf << std::endl;
         return 1;
     }
-
     pcap_close(fd);
+
+    // export all remaining flows in cache
+    flow_cache.export_cache();
+
     return 0;
 }

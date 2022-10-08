@@ -1,10 +1,5 @@
 #include "netflowv5.hpp"
 
-#define BUFFLEN 64
-#define PROTOCOL_TCP 6
-#define PROTOCOL_ICMP 8
-#define PROTOCOL_UDP 17
-
 Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet, uint32_t time_ms)
 {
     const struct ip *ip = (struct ip*)(packet + sizeof(struct ether_header));
@@ -36,12 +31,16 @@ Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet, uin
 
         case PROTOCOL_ICMP:
         {
+            prot = PROTOCOL_ICMP;
             srcport = 0;
             dstport = 0;
             tcp_flags = 0;
+            break;
         }
 
         default:
+            // TODO
+            std::cerr << "Unsupported packet\n";
             break;
     }
 
@@ -50,4 +49,28 @@ Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet, uin
     first = time_ms;
     last = time_ms;
     tos = ip->ip_tos;
+}
+
+void Netflowv5::pack(nf5_record_t &record)
+{
+    record.srcaddr = srcaddr;
+    record.dstaddr = dstaddr;
+    record.nexthop = nexthop;
+    record.input = input;
+    record.output = output;
+    record.d_pkts = d_pkts;
+    record.d_octets = d_octets;
+    record.first = first;
+    record.last = last;
+    record.srcport = srcport;
+    record.dstport = dstport;
+    record.pad = 0;
+    record.tcp_flags = tcp_flags;
+    record.prot = prot;
+    record.tos = tos;
+    record.src_as = src_as;
+    record.dst_as = dst_as;
+    record.src_mask = src_mask;
+    record.dst_mask = dst_mask;
+    record.pad1 = 0;
 }
