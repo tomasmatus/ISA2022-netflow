@@ -15,7 +15,7 @@ void FlowCache::insert_update_flow(Netflowv5 *flow)
 
     if (cache.size() >= max_cache_size)
     {
-        // TODO export oldest flow
+        export_oldest();
     }
 
     std::tuple<uint32_t, uint32_t, uint16_t, uint16_t, uint8_t> flow_key = { flow->srcaddr, flow->dstaddr, flow->srcport, flow->dstport, flow->prot };
@@ -72,6 +72,20 @@ void FlowCache::export_flow(Netflowv5 *flow)
     buffer.push_back(record);
 }
 
+void FlowCache::export_oldest()
+{
+    auto oldest = cache.begin();
+    for (auto it = cache.begin(); it != cache.end(); ++it)
+    {
+        if (it->second->first < oldest->second->first)
+            oldest = it;
+    }
+
+    export_flow(oldest->second);
+    flush_buffer();
+    cache.erase(oldest);
+}
+
 void FlowCache::flush_buffer()
 {
     if (buffer.size() == 0)
@@ -81,7 +95,8 @@ void FlowCache::flush_buffer()
     u_char *nf5_records_export = new u_char[export_size];
 
     nf5_header_t nf5_header = { .version = htons(NF5_VERSION), .count = htons(buffer.size()), .sys_uptime = htonl(time_since_boot_ms),
-                                .unix_secs = htonl((sys_uptime_ms + time_since_boot_ms) / 1000), .unix_nsecs = htonl(((sys_uptime_ms + time_since_boot_ms) % 1000) * 1000000), .flow_sequence = htonl(flow_sequence),
+                                .unix_secs = htonl((sys_uptime_ms + time_since_boot_ms) / 1000),
+                                .unix_nsecs = htonl(((sys_uptime_ms + time_since_boot_ms) % 1000) * 1000000), .flow_sequence = htonl(flow_sequence),
                                 .engine_type = 0, .engine_id = 0, .sampling_interval = 0 };
     flow_sequence += buffer.size();
 

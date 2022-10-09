@@ -33,6 +33,8 @@ class FlowCache {
 
         void export_flow(Netflowv5 *flow);
 
+        void export_oldest();
+
         void flush_buffer();
 
         void send_packet(u_char *data, size_t size);
