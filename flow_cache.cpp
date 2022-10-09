@@ -1,4 +1,5 @@
 #include "flow_cache.hpp"
+#include <err.h>
 
 void FlowCache::insert_update_flow(Netflowv5 *flow)
 {
@@ -79,9 +80,10 @@ void FlowCache::flush_buffer()
     size_t export_size = sizeof(nf5_header_t) + sizeof(nf5_record_t) * buffer.size();
     u_char *nf5_records_export = new u_char[export_size];
 
-    nf5_header_t nf5_header = { .version = NF5_VERSION, .count = (uint16_t) buffer.size(), .sys_uptime = time_since_boot_ms,
-                                .unix_secs = (sys_uptime_ms / 1000) + (time_since_boot_ms / 1000), .unix_nsecs = 0, .flow_sequence = 0,
+    nf5_header_t nf5_header = { .version = htons(NF5_VERSION), .count = htons(buffer.size()), .sys_uptime = htonl(time_since_boot_ms),
+                                .unix_secs = htonl((sys_uptime_ms + time_since_boot_ms) / 1000.0), .unix_nsecs = htonl(0), .flow_sequence = htonl(flow_sequence),
                                 .engine_type = 0, .engine_id = 0, .sampling_interval = 0 };
+    flow_sequence += buffer.size();
 
     std::memcpy(nf5_records_export, &nf5_header, sizeof(nf5_header_t));
 
@@ -91,9 +93,38 @@ void FlowCache::flush_buffer()
     }
 
     // TODO send packet
+    send_packet(nf5_records_export, export_size);
 
     delete[] nf5_records_export;
     buffer.clear();
+}
+
+void FlowCache::send_packet(u_char *data, size_t size)
+{
+    int socket_fd;
+    struct sockaddr_in server;
+    struct hostent *servent;
+
+    memset(&server,0,sizeof(server)); // erase the server structure
+
+    if ((servent = gethostbyname(collector.c_str())) == NULL) // check the first parameter
+    {
+        perror("gethostbyname() failed");
+    }
+    memcpy(&(server.sin_addr),servent->h_addr,servent->h_length);
+
+    // TODO hostname parsting
+    server.sin_port = htons(9995);
+    server.sin_family = AF_INET;
+    if ((socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1)   //create a client socket
+    {
+        perror("socket() failed");
+    }
+
+    if (sendto(socket_fd, data, size, 0, (struct sockaddr *)&server, sizeof(server)) == -1)
+    {
+        perror("sendo failed");
+    }
 }
 
 std::size_t FlowCache::get_cache_size()
@@ -101,7 +132,7 @@ std::size_t FlowCache::get_cache_size()
     return cache.size();
 }
 
-uint32_t FlowCache::get_miliseconds(uint32_t s, uint32_t us)
+uint32_t FlowCache::get_miliseconds(uint64_t s, uint64_t us)
 {
     if (!sys_uptime_ms)
     {

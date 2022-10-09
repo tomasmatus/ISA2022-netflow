@@ -58,6 +58,8 @@ int main(int argc, char **argv)
             
             // netflow collector IP/hostname[:port]
             case 'c':
+                // validity check
+                collector = optarg;
                 break;
             
             // active timer timeout

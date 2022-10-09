@@ -53,17 +53,17 @@ Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet, uin
 
 void Netflowv5::pack(nf5_record_t &record)
 {
-    record.srcaddr = srcaddr;
-    record.dstaddr = dstaddr;
-    record.nexthop = nexthop;
-    record.input = input;
-    record.output = output;
-    record.d_pkts = d_pkts;
-    record.d_octets = d_octets;
-    record.first = first;
-    record.last = last;
-    record.srcport = srcport;
-    record.dstport = dstport;
+    record.srcaddr = htonl(srcaddr);
+    record.dstaddr = htonl(dstaddr);
+    record.nexthop = htonl(nexthop);
+    record.input = htons(input);
+    record.output = htons(output);
+    record.d_pkts = htonl(d_pkts);
+    record.d_octets = htonl(d_octets);
+    record.first = htonl(first);
+    record.last = htonl(last);
+    record.srcport = htons(srcport);
+    record.dstport = htons(dstport);
     record.pad = 0;
     record.tcp_flags = tcp_flags;
     record.prot = prot;
