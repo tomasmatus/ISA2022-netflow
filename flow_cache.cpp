@@ -81,7 +81,7 @@ void FlowCache::flush_buffer()
     u_char *nf5_records_export = new u_char[export_size];
 
     nf5_header_t nf5_header = { .version = htons(NF5_VERSION), .count = htons(buffer.size()), .sys_uptime = htonl(time_since_boot_ms),
-                                .unix_secs = htonl((sys_uptime_ms + time_since_boot_ms) / 1000.0), .unix_nsecs = htonl(0), .flow_sequence = htonl(flow_sequence),
+                                .unix_secs = htonl((sys_uptime_ms + time_since_boot_ms) / 1000), .unix_nsecs = htonl(((sys_uptime_ms + time_since_boot_ms) % 1000) * 1000000), .flow_sequence = htonl(flow_sequence),
                                 .engine_type = 0, .engine_id = 0, .sampling_interval = 0 };
     flow_sequence += buffer.size();
 
