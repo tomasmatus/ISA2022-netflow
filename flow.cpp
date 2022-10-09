@@ -105,12 +105,23 @@ int main(int argc, char **argv)
         std::cerr << "Error when opening pcap file: " << errbuf << "\n";
         return 1;
     }
-    // TODO add filter
+
+    struct bpf_program fp;
+    if (pcap_compile(fd, &fp, "ip and (tcp or udp or icmp)", 0, PCAP_NETMASK_UNKNOWN) == -1) {
+        std::cerr << "Can't compile filter " << errbuf << std::endl;
+        return 1;
+    }
+
+    if (pcap_setfilter(fd, &fp) == -1) {
+        std::cerr << "Can't set filter " << errbuf << std::endl;
+        return 1;
+    }
 
     if (pcap_loop(fd, -1, read_packet, nullptr) == PCAP_ERROR) {
         std::cerr << "pcap_loop fail: " << errbuf << std::endl;
         return 1;
     }
+    pcap_freecode(&fp);
     pcap_close(fd);
 
     // export all remaining flows in cache

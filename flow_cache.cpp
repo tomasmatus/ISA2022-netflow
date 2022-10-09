@@ -92,7 +92,6 @@ void FlowCache::flush_buffer()
        std::memcpy(nf5_records_export + sizeof(nf5_header_t) + i * sizeof(nf5_record_t), &buffer[i], sizeof(nf5_record_t));
     }
 
-    // TODO send packet
     send_packet(nf5_records_export, export_size);
 
     delete[] nf5_records_export;
@@ -113,7 +112,7 @@ void FlowCache::send_packet(u_char *data, size_t size)
     }
     memcpy(&(server.sin_addr),servent->h_addr,servent->h_length);
 
-    // TODO hostname parsting
+    // TODO hostname parsing
     server.sin_port = htons(9995);
     server.sin_family = AF_INET;
     if ((socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1)   //create a client socket
