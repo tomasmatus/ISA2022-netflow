@@ -83,6 +83,9 @@ class Netflowv5 {
 
         Netflowv5(const struct pcap_pkthdr *pcap_hdr, const u_char *packet, u_int32_t time_ms);
 
+        /**
+         * @brief prepare flow for exporting
+         */
         void pack(nf5_record_t &record);
 };
 
