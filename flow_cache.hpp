@@ -26,7 +26,8 @@ class FlowCache {
         uint32_t active_timer = 60 * 1000;
         uint32_t inactive_timer = 10 * 1000;
         uint32_t max_cache_size = 1024;
-        std::string collector = "127.0.0.1:2055";
+        std::string collector = "127.0.0.1";
+        uint16_t collector_port = 2055;
         uint16_t flow_sequence = 0;
 
         void export_on_timer(bool export_all = false);
@@ -52,7 +53,7 @@ class FlowCache {
          */
         uint32_t get_miliseconds(uint64_t s, uint64_t us);
 
-        void set_flowcache(int active, int inactive, int size, std::string collect);
+        void set_flowcache(int active, int inactive, int size, std::string collect, uint16_t port);
 
         void export_cache();
 };

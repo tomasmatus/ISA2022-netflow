@@ -157,12 +157,13 @@ uint32_t FlowCache::get_miliseconds(uint64_t s, uint64_t us)
     return (s * 1000 + us / 1000) - sys_uptime_ms;
 }
 
-void FlowCache::set_flowcache(int active, int inactive, int size, std::string collect)
+void FlowCache::set_flowcache(int active, int inactive, int size, std::string collect, uint16_t port)
 {
     active_timer = active;
     inactive_timer = inactive;
     max_cache_size = size;
     collector = collect;
+    collector_port = port;
 }
 
 void FlowCache::export_cache()

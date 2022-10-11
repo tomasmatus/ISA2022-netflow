@@ -8,6 +8,7 @@
 #include <iostream>
 #include <vector>
 #include <getopt.h>
+#include <regex>
 
 #include <pcap/pcap.h>
 #include <net/ethernet.h>       // struct ethernet
@@ -24,6 +25,53 @@
 #define BUFFLEN 64
 
 FlowCache flow_cache;
+
+uint count_char(char needle, std::string str)
+{
+    uint cnt = 0;
+    for (auto ch : str)
+    {
+        if (needle == ch)
+            cnt++;
+    }
+
+    return cnt;
+}
+
+int parse_collector(std::string &hostname, uint16_t &port)
+{
+    // possible valid inputs:
+    // ip               127.0.0.1
+    // ip:port          127.0.0.1:2055
+    // ipv6             ::1
+    // [ipv6]:port      [::1]:2055
+    // hostname         localhost
+    // hostname:port    localhost:2055
+    uint cnt = count_char(':', hostname);
+    if (cnt == 1)
+    {
+        // ip:port or hostname:port
+        size_t pos = hostname.find(':');
+        port = std::stoi(hostname.c_str() + pos + 1);
+        hostname.erase(pos);
+    }
+    else if (cnt > 1)
+    {
+        // ipv6 or [ipv6]:port
+        size_t pos = hostname.find(']');
+        if (pos != std::string::npos)
+        {
+            port = std::stoi(hostname.c_str() + pos + 2);
+            hostname.erase(pos).erase(0, 1);
+        }
+    }
+    else // cnt == 0
+    {
+        // ip or hostname
+    }
+
+    return 0;
+}
 
 void read_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
 {
@@ -42,7 +90,8 @@ int main(int argc, char **argv)
     const char *shortopts = "f:c:a:i:m:";
     int opt = 0;
     std::string filename = "-"; // "-" is a synonym for stdin
-    std::string collector = "127.0.0.1:2055";
+    std::string collector = "127.0.0.1";
+    uint16_t port = 2055;
     int active_timer = 60 * 1000;
     int inactive_timer = 10 * 1000;
     int cache_size = 1024;
@@ -59,34 +108,58 @@ int main(int argc, char **argv)
             // netflow collector IP/hostname[:port]
             case 'c':
                 // validity check
-                collector = optarg;
+                try
+                {
+                    collector = optarg;
+                    parse_collector(collector, port);
+                }
+                catch(const std::invalid_argument& e)
+                {
+                    std::cerr << e.what() << '\n';
+                    exit(1);
+                }
                 break;
             
             // active timer timeout
             case 'a':
-                active_timer = std::stoi(optarg) * 1000;
-                if (active_timer <= 0)
+                try
                 {
-                    std::cerr << "Active timer value must be above 0. Specified value: " << active_timer << "\n";
+                    active_timer = std::stoi(optarg) * 1000;
+                    if (inactive_timer <= 0)
+                        throw std::invalid_argument("Active timer must be value above 0");
+                }
+                catch(const std::invalid_argument& e)
+                {
+                    std::cerr << e.what() << '\n';
                     exit(1);
                 }
                 break;
             // inactive timer timeout
             case 'i':
-                inactive_timer = std::stoi(optarg) * 1000;
-                if (inactive_timer <= 0)
+                try
                 {
-                    std::cerr << "Inactive timer value must be above 0. Specified value: " << inactive_timer << "\n";
+                    inactive_timer = std::stoi(optarg) * 1000;
+                    if (inactive_timer <= 0)
+                        throw std::invalid_argument("Inactive timer must be value above 0");
+                }
+                catch(const std::invalid_argument& e)
+                {
+                    std::cerr << e.what() << '\n';
                     exit(1);
                 }
                 break;
             
             // flow-cache size
             case 'm':
-                cache_size = std::stoi(optarg);
-                if (cache_size <= 0)
+                try
                 {
-                    std::cerr << "Cache size must be above 0. Specified value: " << cache_size << "\n";
+                    cache_size = std::stoi(optarg) * 1000;
+                    if (cache_size <= 0)
+                        throw std::invalid_argument("Cache size must be value above 0");
+                }
+                catch(const std::invalid_argument& e)
+                {
+                    std::cerr << e.what() << '\n';
                     exit(1);
                 }
                 break;
@@ -96,7 +169,7 @@ int main(int argc, char **argv)
         }
     }
 
-    flow_cache.set_flowcache(active_timer, inactive_timer, cache_size, collector);
+    flow_cache.set_flowcache(active_timer, inactive_timer, cache_size, collector, port);
 
     char errbuf[PCAP_ERRBUF_SIZE];
     pcap_t *fd = pcap_open_offline (filename.c_str(), errbuf);
