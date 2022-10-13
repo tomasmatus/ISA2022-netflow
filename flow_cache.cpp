@@ -115,30 +115,46 @@ void FlowCache::flush_buffer()
 
 void FlowCache::send_packet(u_char *data, size_t size)
 {
-    int socket_fd;
-    struct sockaddr_in server;
-    struct hostent *servent;
+    struct sockaddr_storage server;
+    struct addrinfo *host;
+    struct addrinfo hints;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_UNSPEC; // IPv4 or IPv6
+    hints.ai_socktype = SOCK_DGRAM; // UDP socket
+    hints.ai_protocol = IPPROTO_UDP; // UDP protocol
 
     memset(&server,0,sizeof(server)); // erase the server structure
 
-    if ((servent = gethostbyname(collector.c_str())) == NULL) // check the first parameter
+    int s = getaddrinfo(collector.c_str(), NULL, &hints, &host);
+    if (s != 0) // check the first parameter
     {
-        perror("gethostbyname() failed");
+        std::cerr << gai_strerror(s) << "\n";
+        perror("getaddrinfo() failed");
     }
-    memcpy(&(server.sin_addr),servent->h_addr,servent->h_length);
+
+    // memcpy(&(server.sin_addr),servent->h_addr,servent->h_length);
 
     // TODO hostname parsing
-    server.sin_port = htons(9995);
-    server.sin_family = AF_INET;
-    if ((socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1)   //create a client socket
+    // server.sin_port = htons(collector_port);
+    // server.sin_family = AF_INET;
+    int socket_fd;
+    struct addrinfo *rp = NULL;
+    for (rp = host; rp != NULL; rp = rp->ai_next)
     {
-        perror("socket() failed");
+        if ((socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1)
+            continue;
+
+        if (sendto(socket_fd, data, size, 0, rp->ai_addr, rp->ai_addrlen) != -1)
+            break;
     }
 
-    if (sendto(socket_fd, data, size, 0, (struct sockaddr *)&server, sizeof(server)) == -1)
+    if (rp == NULL)
     {
-        perror("sendo failed");
+        perror("Failed to send packets");
+        exit(1);
     }
+
+    freeaddrinfo(host);
 }
 
 std::size_t FlowCache::get_cache_size()
@@ -157,7 +173,7 @@ uint32_t FlowCache::get_miliseconds(uint64_t s, uint64_t us)
     return (s * 1000 + us / 1000) - sys_uptime_ms;
 }
 
-void FlowCache::set_flowcache(int active, int inactive, int size, std::string collect, uint16_t port)
+void FlowCache::set_flowcache(int active, int inactive, int size, std::string collect, std::string port)
 {
     active_timer = active;
     inactive_timer = inactive;

@@ -38,7 +38,7 @@ uint count_char(char needle, std::string str)
     return cnt;
 }
 
-int parse_collector(std::string &hostname, uint16_t &port)
+int parse_collector(std::string &hostname, std::string &port)
 {
     // possible valid inputs:
     // ip               127.0.0.1
@@ -52,7 +52,7 @@ int parse_collector(std::string &hostname, uint16_t &port)
     {
         // ip:port or hostname:port
         size_t pos = hostname.find(':');
-        port = std::stoi(hostname.c_str() + pos + 1);
+        port = hostname.c_str() + pos + 1;
         hostname.erase(pos);
     }
     else if (cnt > 1)
@@ -91,7 +91,7 @@ int main(int argc, char **argv)
     int opt = 0;
     std::string filename = "-"; // "-" is a synonym for stdin
     std::string collector = "127.0.0.1";
-    uint16_t port = 2055;
+    std::string port = "2055";
     int active_timer = 60 * 1000;
     int inactive_timer = 10 * 1000;
     int cache_size = 1024;

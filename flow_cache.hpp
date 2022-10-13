@@ -28,7 +28,7 @@ class FlowCache {
         uint32_t inactive_timer = 10 * 1000;
         uint32_t max_cache_size = 1024;
         std::string collector = "127.0.0.1";
-        uint16_t collector_port = 2055;
+        std::string collector_port = "2055";
 
         /**
          * @brief finds expired flows to export and removes them from cache
@@ -74,7 +74,7 @@ class FlowCache {
         /**
          * @brief set cache parameters and collector information
          */
-        void set_flowcache(int active, int inactive, int size, std::string collect, uint16_t port);
+        void set_flowcache(int active, int inactive, int size, std::string collect, std::string port);
 
         /**
          * @brief export remaining flows when finished reading pcap file
