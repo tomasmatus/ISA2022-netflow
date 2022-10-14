@@ -115,46 +115,38 @@ void FlowCache::flush_buffer()
 
 void FlowCache::send_packet(u_char *data, size_t size)
 {
-    struct sockaddr_storage server;
     struct addrinfo *host;
     struct addrinfo hints;
-    memset(&hints, 0, sizeof(hints));
+    std::memset(&hints, 0, sizeof(hints));
     hints.ai_family = AF_UNSPEC; // IPv4 or IPv6
     hints.ai_socktype = SOCK_DGRAM; // UDP socket
     hints.ai_protocol = IPPROTO_UDP; // UDP protocol
 
-    memset(&server,0,sizeof(server)); // erase the server structure
-
-    int s = getaddrinfo(collector.c_str(), NULL, &hints, &host);
+    int s = getaddrinfo(collector.c_str(), collector_port.c_str(), &hints, &host);
     if (s != 0) // check the first parameter
     {
         std::cerr << gai_strerror(s) << "\n";
         perror("getaddrinfo() failed");
     }
 
-    // memcpy(&(server.sin_addr),servent->h_addr,servent->h_length);
-
-    // TODO hostname parsing
-    // server.sin_port = htons(collector_port);
-    // server.sin_family = AF_INET;
     int socket_fd;
     struct addrinfo *rp = NULL;
     for (rp = host; rp != NULL; rp = rp->ai_next)
     {
-        if ((socket_fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1)
+        if ((socket_fd = socket(rp->ai_family, rp->ai_socktype, rp->ai_protocol)) == -1)
             continue;
 
         if (sendto(socket_fd, data, size, 0, rp->ai_addr, rp->ai_addrlen) != -1)
             break;
     }
 
+    freeaddrinfo(host);
+
     if (rp == NULL)
     {
         perror("Failed to send packets");
         exit(1);
     }
-
-    freeaddrinfo(host);
 }
 
 std::size_t FlowCache::get_cache_size()
