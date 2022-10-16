@@ -32,11 +32,15 @@ class FlowCache {
 
         /**
          * @brief finds expired flows to export and removes them from cache
+         *
+         * @param export_all optional parameter to force clean cache at the end of reading network communication
          */
         void export_on_timer(bool export_all = false);
 
         /**
          * @brief prepares flow to be exported with max count checking (1-30 flows per export)
+         *
+         * @param flow flow to exporrt
          */
         void export_flow(Netflowv5 *flow);
 
@@ -52,12 +56,17 @@ class FlowCache {
 
         /**
          * @brief sends data to collector
+         *
+         * @param data packed neflow records with a header
+         * @param size size of data in bytes
          */
         void send_packet(u_char *data, size_t size);
 
     public:
         /**
          * @brief update existing flow or add new one when it is not present in cache
+         *
+         * @param flow flow to insert or update
          */
         void insert_update_flow(Netflowv5 *flow);
 
@@ -68,11 +77,20 @@ class FlowCache {
 
         /**
          * @brief get time in miliseconds since sys boot time
+         *
+         * @param s seconds when packet was captured
+         * @param us microseconds when packet was captured
          */
         uint32_t get_miliseconds(uint64_t s, uint64_t us);
 
         /**
          * @brief set cache parameters and collector information
+         *
+         * @param active active timout in seconds
+         * @param inactive inactive timeout in seconds
+         * @param size size of cache
+         * @param collect ip or hostname of collector
+         * @param port port used on collector
          */
         void set_flowcache(int active, int inactive, int size, std::string collect, std::string port);
 

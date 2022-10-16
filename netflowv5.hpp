@@ -86,6 +86,8 @@ class Netflowv5 {
 
         /**
          * @brief prepare flow for exporting
+         *
+         * @param record Netflow record
          */
         void pack(nf5_record_t &record);
 };
