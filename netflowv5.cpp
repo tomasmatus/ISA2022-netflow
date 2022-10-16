@@ -33,8 +33,10 @@ Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet, uin
         case PROTOCOL_ICMP:
         {
             prot = PROTOCOL_ICMP;
+            const struct icmphdr *icmp = (struct icmphdr*)(packet + sizeof(struct ether_header) + ip->ip_hl * 4);
             srcport = 0;
-            dstport = 0;
+            // for ICMP destination port is: port = ICMP-Type * 256 + ICMP-Code
+            dstport = ntohs(icmp->type * 256 + icmp->code);
             tcp_flags = 0;
             break;
         }

@@ -12,6 +12,7 @@
 #include <netinet/ip6.h>        // struct ip6_hdr
 #include <netinet/tcp.h>
 #include <netinet/udp.h>
+#include <netinet/ip_icmp.h>
 #include <sys/sysinfo.h>
 
 #define BUFFLEN 64

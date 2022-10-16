@@ -61,7 +61,7 @@ int parse_collector(std::string &hostname, std::string &port)
         size_t pos = hostname.find(']');
         if (pos != std::string::npos)
         {
-            port = std::stoi(hostname.c_str() + pos + 2);
+            port = hostname.c_str() + pos + 2;
             hostname.erase(pos).erase(0, 1);
         }
     }
