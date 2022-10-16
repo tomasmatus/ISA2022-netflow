@@ -7,6 +7,7 @@ Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet, uin
     dstaddr = ntohl(ip->ip_dst.s_addr);
 
     uint8_t protocol = ip->ip_p;
+
     switch (protocol)
     {
         case PROTOCOL_TCP:
@@ -48,7 +49,7 @@ Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet, uin
     }
 
     d_pkts = 1;
-    d_octets = header->caplen - sizeof(struct ether_header);
+    d_octets = ntohs(ip->ip_len);
     first = time_ms;
     last = time_ms;
     tos = ip->ip_tos;
