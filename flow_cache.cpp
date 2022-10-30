@@ -34,6 +34,21 @@ void FlowCache::insert_update_flow(Netflowv5 *flow)
         cache[flow_key] = flow;
     }
 
+    // RST or FIN flag in TCP
+    if (flow->tcp_flags & 1u || flow->tcp_flags & 4u)
+    {
+        if (search != cache.end())
+        {
+            export_flow(search->second);
+            cache.erase(search);
+        }
+        else
+        {
+            export_flow(flow);
+            cache.erase(flow_key);
+        }
+    }
+
     if (search != cache.end())
         delete flow;
 }

@@ -12,12 +12,11 @@ Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet, uin
     {
         case PROTOCOL_TCP:
         {
-            // TODO TCP FIN
             prot = PROTOCOL_TCP;
             const struct tcphdr *tcp = (struct tcphdr*)(packet + sizeof(struct ether_header) + ip->ip_hl * 4);
             srcport = ntohs(tcp->th_sport);
             dstport = ntohs(tcp->th_dport);
-            tcp_flags = tcp->th_dport;
+            tcp_flags = tcp->th_flags;
             break;
         }
 
