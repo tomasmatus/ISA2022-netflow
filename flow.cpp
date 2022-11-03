@@ -153,7 +153,7 @@ int main(int argc, char **argv)
             case 'm':
                 try
                 {
-                    cache_size = std::stoi(optarg) * 1000;
+                    cache_size = std::stoi(optarg);
                     if (cache_size <= 0)
                         throw std::invalid_argument("Cache size must be value above 0");
                 }

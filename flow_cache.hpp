@@ -19,9 +19,9 @@ class FlowCache {
         // unix time to substract from other timers to get ms from 0 (first packet)
         uint64_t sys_uptime_ms = 0;
         // time of last export since boot ms
-        uint32_t last_export_ms = 0;
+        uint64_t last_export_ms = 0;
         // current time ms
-        uint32_t time_since_boot_ms = 0;
+        uint64_t time_since_boot_ms = 0;
         uint16_t flow_sequence = 0;
 
         uint32_t active_timer = 60 * 1000;
