@@ -1,3 +1,10 @@
+/*
+ * ISA project
+ * Author: Tomáš Matuš
+ * Login: xmatus37
+ * Date: 06.11.2022
+ */
+
 #ifndef netflowv5_hpp
 #define netflowv5_hpp
 

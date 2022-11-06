@@ -1,3 +1,10 @@
+/*
+ * ISA project
+ * Author: Tomáš Matuš
+ * Login: xmatus37
+ * Date: 06.11.2022
+ */
+
 #include "netflowv5.hpp"
 
 Netflowv5::Netflowv5(const struct pcap_pkthdr *header, const u_char *packet, uint32_t time_ms)
