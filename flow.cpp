@@ -16,6 +16,7 @@
 #include <netinet/ip.h>         // struct ip
 #include <netinet/ip6.h>        // struct ip6_hdr
 #include <netinet/in.h>         // inet_ntoa
+#define __FAVOR_BSD
 #include <netinet/tcp.h>
 #include <netinet/udp.h>
 

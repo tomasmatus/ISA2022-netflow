@@ -31,5 +31,11 @@ clean:
 	rm -f *.o $(exec)
 	rm -f $(NAME).{aux,out,dvi,ps,log,te~,bcf,xml,pdf}
 
+eva: zip
+	scp $(login).zip $(login)@eva.fit.vutbr.cz:~/isa
+
 tar:
-	tar -cf $(login).tar *.cpp Makefile README.md manual.pdf
+	tar -cf $(login).tar *.cpp *.hpp Makefile
+
+zip:
+	zip $(login).zip *.cpp *.hpp Makefile
