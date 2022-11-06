@@ -85,6 +85,7 @@ void FlowCache::export_flow(Netflowv5 *flow)
     nf5_record_t record;
     flow->pack(record);
     buffer.push_back(record);
+    delete flow;
 }
 
 void FlowCache::export_oldest()
