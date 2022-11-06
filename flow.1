@@ -1,0 +1,37 @@
+.TH FLOW 1
+.SH NAME
+flow \- export traffic from pcap file in Netflow v5 format
+.SH SYNOPSIS
+.B flow
+[\fB\-f\fR \fIFILE\fR]
+[\fB\-c\fR \fICOLLECTOR[:PORT]\fR]
+[\fB\-a\fR \fIACTIVE_TIMEOUT\fR]
+[\fB\-i\fR \fIINACTIVE_TIMEOUT\fR]
+[\fB\-m\fR \fICACHE_SIZE\fR]
+.SH DESCRIPTION
+.B flow
+exports captured communication in NetFlow v5 datagrams and sends it to flow collector
+.SH OPTIONS
+.TP
+.BR \-f " " \fIFILE\fR
+Specify input file.
+Default is STDIN
+.TP
+.BR \-c " " \fICOLLECTOR[:PORT]\fR
+Set ip address or hostname of collector.
+Optionally specify port used on collector.
+Default is 127.0.0.1:2055
+.TP
+.BR \-a " " \fIACTIVE_TIMEOUT\fR
+Set time (seconds) after which active flows should be exported.
+Default is 60 seconds
+.TP
+.BR \-i " " \fIINACTIVE_TIMEOUT\fR
+Set time (seconds) after which inactive flows should be exported.
+Default is 10 seconds
+.TP
+.BR \-m " " \fICACHE_SIZE\fR
+Set maximum size of flow cache.
+Default is 1024
+.SH AUTHOR
+Tomáš Matuš (xmatus37)
