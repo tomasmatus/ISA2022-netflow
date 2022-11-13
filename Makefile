@@ -11,10 +11,11 @@ exec=flow
 login=xmatus37
 NAME=manual
 SHELL=/usr/bin/env bash
+FILES=*.cpp *.hpp Makefile manual.pdf flow.1 README.md
 
 all: $(exec)
 
-pdf: 
+pdf:
 	pdflatex $(NAME)
 	pdflatex $(NAME)
 
@@ -29,13 +30,13 @@ $(exec): flow.o netflowv5.o flow_cache.o
 #### MISC
 clean:
 	rm -f *.o $(exec)
-	rm -f $(NAME).{aux,out,dvi,ps,log,te~,bcf,xml,pdf}
+	rm -f $(NAME).{aux,out,dvi,ps,log,te~,bcf,xml}
 
 eva: zip
 	scp $(login).zip $(login)@eva.fit.vutbr.cz:~/isa
 
 tar:
-	tar -cf $(login).tar *.cpp *.hpp Makefile
+	tar -cf $(login).tar $(FILES)
 
 zip:
-	zip $(login).zip *.cpp *.hpp Makefile
+	zip $(login).zip $(FILES)
